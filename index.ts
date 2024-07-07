@@ -36,6 +36,7 @@ const app = new Application();
 
 app.use((ctx, next) => {
   // TODO: Add domain to the Access-Control-Allow-Origin header once you deploy
+
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
   ctx.response.headers.set("Access-Control-Allow-Methods", "OPTIONS,GET");
   ctx.response.headers.set(
