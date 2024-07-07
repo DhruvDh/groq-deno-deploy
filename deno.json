@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^16.1.0"
+  }
+}
