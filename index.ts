@@ -5,6 +5,12 @@ const router = new Router();
 const groq = new Groq({ apiKey: Deno.env.get("GROQ_API_KEY") });
 
 async function callClaudeAPI(messages) {
+  // Extract the system message if it exists
+  const systemMessage = messages.find((msg) => msg.role === "system")?.content;
+
+  // Filter out the system message from the messages array
+  const filteredMessages = messages.filter((msg) => msg.role !== "system");
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -15,20 +21,12 @@ async function callClaudeAPI(messages) {
     body: JSON.stringify({
       model: "claude-3-5-sonnet-20240620",
       max_tokens: 2048,
-      messages: messages,
+      system: systemMessage,
+      messages: filteredMessages,
     }),
   });
 
   if (!response.ok) {
-    console.log(JSON.stringify(response));
-    console.log(
-      JSON.stringify({
-        model: "claude-3-5-sonnet-20240620",
-        max_tokens: 2048,
-        messages: messages,
-      })
-    );
-
     throw new Error(
       `Claude API request failed with status ${response.status}.`
     );
@@ -44,7 +42,8 @@ router
   })
   .post("/", async (ctx) => {
     try {
-      const messages = await ctx.request.body.json();
+      const requestBody = await ctx.request.body.json();
+      const messages = requestBody.messages;
       let data;
 
       try {
@@ -54,6 +53,7 @@ router
         console.error("Claude API Error:", claudeError);
 
         // If Claude fails, fall back to Groq (Llama 3)
+        // For Groq, we keep the original message structure including the system message
         data = await groq.chat.completions.create({
           temperature: 0.6,
           stream: false,
