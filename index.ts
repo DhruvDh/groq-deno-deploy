@@ -42,18 +42,15 @@ router
   })
   .post("/", async (ctx) => {
     try {
-      const requestBody = await ctx.request.body.json();
-      const messages = requestBody.messages;
+      const messages = await ctx.request.body.json();
+
       let data;
 
       try {
-        // First, try to use Claude API
         data = await callClaudeAPI(messages);
       } catch (claudeError) {
         console.error("Claude API Error:", claudeError);
 
-        // If Claude fails, fall back to Groq (Llama 3)
-        // For Groq, we keep the original message structure including the system message
         data = await groq.chat.completions.create({
           temperature: 0.6,
           stream: false,
