@@ -20,7 +20,18 @@ async function callClaudeAPI(messages) {
   });
 
   if (!response.ok) {
-    throw new Error(`Claude API request failed with status ${response.status}`);
+    console.log(JSON.stringify(response));
+    console.log(
+      JSON.stringify({
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 2048,
+        messages: messages,
+      })
+    );
+
+    throw new Error(
+      `Claude API request failed with status ${response.status}.`
+    );
   }
 
   return await response.json();
