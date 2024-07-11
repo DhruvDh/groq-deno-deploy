@@ -27,6 +27,7 @@ async function callClaudeAPI(messages) {
   });
 
   if (!response.ok) {
+    console.log(JSON.stringify(filteredMessages));
     throw new Error(
       `Claude API request failed with status ${response.status}.`
     );
